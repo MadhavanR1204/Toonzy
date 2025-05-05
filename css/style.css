@@ -168,50 +168,11 @@ ul {
 /* ==============================
    Hero Banner Styles
    ============================== */
-.hero-banner {
+   .hero-banner {
     padding: 20px 0;
     background-color: var(--bg-color);
 }
 
-.banner-content {
-    position: relative;
-}
-
-.hero-slide {
-    position: relative;
-    border-radius: var(--small-radius);
-    overflow: hidden;
-}
-
-.banner-img {
-    width: 100%;
-    height: auto;
-    max-height: 300px;
-    object-fit: cover;
-    border-radius: var(--small-radius);
-}
-
-.banner-text {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    text-align: center;
-    color: white;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-}
-
-.banner-text h2 {
-    font-size: 3rem;
-    font-weight: 700;
-    margin-bottom: 10px;
-}
-
-.banner-text p {
-    font-size: 1.2rem;
-}
-
-/* Hero Banner Carousel Styles */
 .banner-content {
     position: relative;
     margin: 30px 0;
@@ -220,7 +181,7 @@ ul {
 .banner-carousel {
     position: relative;
     width: 100%;
-    height: 300px;
+    height: 500px; /* Increased from 300px to 500px */
     overflow: hidden;
     border-radius: var(--small-radius);
 }
@@ -245,29 +206,6 @@ ul {
     height: 100%;
     object-fit: cover;
     border-radius: var(--small-radius);
-}
-
-.banner-text {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    text-align: center;
-    color: white;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.7);
-    z-index: 2;
-    width: 80%;
-}
-
-.banner-text h2 {
-    font-size: 3rem;
-    font-weight: 700;
-    margin-bottom: 10px;
-    text-transform: uppercase;
-}
-
-.banner-text p {
-    font-size: 1.2rem;
 }
 
 /* Navigation Arrows */
@@ -432,9 +370,19 @@ ul {
     border-radius: var(--small-radius);
     font-size: 0.9rem;
     font-weight: 500;
-    white-space: nowrap;
+    white-space: normal;
     overflow: hidden;
     text-overflow: ellipsis;
+    max-width: 250px; /* Adjust this value based on your design */
+    /* Fixed height settings */
+    height: 55px; /* Set a fixed height that accommodates 2 lines of text */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* Line clamping */
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
 }
 
 /* ==============================
