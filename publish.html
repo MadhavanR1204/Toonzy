@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Creator Dashboard - Toonzy</title>
+    <link rel="stylesheet" href="css/normalize.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/publish.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Header Navigation -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <a href="index.html" class="logo">
+                    <img src="assets/images/logo.png" alt="Toonzy Logo">
+                    <span class="logo-text">Toonzy</span>
+                </a>
+                <nav class="main-nav">
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="genres.html">Genres</a></li>
+                        <li><a href="comic-detail.html">Library</a></li>
+                        <li><a href="publish.html" class="active">Publish</a></li>
+                    </ul>
+                </nav>
+                <div class="header-right">
+                    <div class="search-box">
+                        <input type="text" placeholder="Search">
+                        <button type="submit"><img src="assets/images/icons/search.svg" alt="Search"></button>
+                    </div>
+                    <a href="profile.html" class="btn-settings">Settings</a>
+                    <a href="#l" class="coins">100</a>
+                    <a href="#">
+                        <img src="assets/images/icons/coin.png" alt="Coins" style="max-width: 40px;">
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Creator Dashboard Content -->
+    <section class="creator-dashboard">
+        <div class="dashboard-container">
+            <!-- Left Sidebar -->
+            <div class="dashboard-sidebar">
+                <div class="create-work-btn">
+                    <a href="#" class="btn-create">Create Work</a>
+                </div>
+                <nav class="dashboard-nav">
+                    <a href="#" class="nav-item active">Home</a>
+                    <a href="#" class="nav-item">Manage Works</a>
+                    <a href="#" class="nav-item">Data Center</a>
+                    <a href="#" class="nav-item">Withdraw</a>
+                    <a href="#" class="nav-item">Interaction</a>
+                    <a href="#" class="nav-item">Growth</a>
+                    <a href="#" class="nav-item">Settings</a>
+                </nav>
+            </div>
+
+            <!-- Main Dashboard Content -->
+            <div class="dashboard-main">
+                <!-- Top Row -->
+                <div class="dashboard-row">
+                    <!-- Creation Level Card -->
+                    <div class="dashboard-card level-card">
+                        <div class="card-header">
+                            <h2>Creation Level</h2>
+                        </div>
+                        <div class="card-content">
+                            <div class="level-info">
+                                <div class="level-badge">
+                                    <img src="assets/publish images/begin.png" alt="Beginner Badge">
+                                </div>
+                                <div class="level-details">
+                                    <p>Your current level is <strong>Beginner</strong>. Publish 5 chapters and upgrade to Bronze!</p>
+                                    <div class="progress-bar">
+                                        <div class="progress" style="width: 30%;"></div>
+                                    </div>
+                                    <div class="progress-text">
+                                        <span>0/5</span>
+                                    </div>
+                                    <p class="level-tip">Level Up to Unlock Benefits</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Announcement Card -->
+                    <div class="dashboard-card announcement-card">
+                        <div class="card-header">
+                            <h2>Announcement</h2>
+                            <a href="#" class="more-link">More ›</a>
+                        </div>
+                        <div class="card-content empty-content">
+                            <div class="empty-icon">
+                                <img src="assets/publish images/no anno.png" alt="No Announcements">
+                            </div>
+                            <p>No Announcement</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Middle Row -->
+                <div class="dashboard-row">
+                    <!-- Data Overview Card -->
+                    <div class="dashboard-card overview-card">
+                        <div class="card-header">
+                            <h2>Data Overview</h2>
+                            <a href="#" class="more-link">More ›</a>
+                        </div>
+                        <div class="card-content">
+                            <div class="upgrade-info">
+                                <h3>Upgrade to Bronze to unlock!</h3>
+                                <p>Publish 5 chapters and upgrade to Bronze!</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Reads Ranking Card -->
+                    <div class="dashboard-card ranking-card">
+                        <div class="card-header">
+                            <h2>Reads Ranking</h2>
+                        </div>
+                        <div class="card-content">
+                            <ul class="ranking-list">
+                                <li class="ranking-item"><span class="rank">1.</span>Crescendo</li>
+                                <li class="ranking-item"><span class="rank">2.</span>You Are My BFF</li>
+                                <li class="ranking-item"><span class="rank">3.</span>Life with my Strict Mentor</li>
+                                <li class="ranking-item"><span class="rank">4.</span>Sloppy First</li>
+                                <li class="ranking-item"><span class="rank">5.</span>Room X Mate</li>
+                                <li class="ranking-item"><span class="rank">6.</span>The Neighbor</li>
+                                <li class="ranking-item"><span class="rank">7.</span>Boyfriend Skirt</li>
+                                <li class="ranking-item"><span class="rank">8.</span>I hate you</li>
+                                <li class="ranking-item"><span class="rank">9.</span>BLACK BLOOD</li>
+                                <li class="ranking-item"><span class="rank">10.</span>Now, I am Demon King</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- My Comics Card -->
+                <div class="dashboard-card comics-card">
+                    <div class="card-header">
+                        <h2>My Comics</h2>
+                        <a href="#" class="more-link">More ›</a>
+                    </div>
+                    <div class="card-content">
+                        <div class="join-now">
+                            <div>
+                                <img src="assets/publish images/my comic.png" alt="Join Now">
+                            </div>
+                            <div class="join-text">
+                                <h3>Join us now!</h3>
+                                <div class="join-actions">
+                                    <div class="join-action">
+                                        <img src="assets//publish images/tick.png" alt="Create a book">
+                                        <span>Create a book</span>
+                                    </div>
+                                    <div class="join-action">
+                                        <img src="assets/publish images/tick.png" alt="Add a chapter">
+                                        <span>Add a chapter</span>
+                                    </div>
+                                    <div class="join-action">
+                                        <img src="assets/publish images/tick.png" alt="Add more chapters">
+                                        <span>Add more chapters</span>
+                                    </div>
+                                    <div class="join-action">
+                                        <img src="assets/publish images/tick.png" alt="Sign up for contract perks">
+                                        <span>Sign up for contract perks</span>
+                                    </div>
+                                </div>
+                                <a href="#" class="btn-new-work">New Work</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Creator's Guide Section -->
+                <div class="dashboard-card guide-card">
+                    <div class="card-header">
+                        <h2>Creator's Guide</h2>
+                    </div>
+                    <div class="card-content">
+                        <div class="guide-grid">
+                            <!-- Guide Item 1 -->
+                            <div class="guide-item">
+                                <div class="guide-image">
+                                    <img src="assets/publish images/1.png" alt="Upload and Manage Work">
+                                </div>
+                                <div class="guide-content">
+                                    <h3>Submitting works and book management</h3>
+                                    <p>Not sure how and where to upload and manage your works? Answers are here!</p> 
+                                </div>
+                            </div>
+
+                            <!-- Guide Item 2 -->
+                            <div class="guide-item">
+                                <div class="guide-image">
+                                    <img src="assets/publish images/2.png" alt="Pass Reviews">
+                                </div>
+                                <div class="guide-content">
+                                    <h3>Perfect ways to pass reviews!</h3>
+                                    <p>Learn about WebComics review rules and improve the success rate of your work reviews!</p>
+                                </div>
+                            </div>
+
+                            <!-- Guide Item 3 -->
+                            <div class="guide-item">
+                                <div class="guide-image">
+                                    <img src="assets/publish images/3.png" alt="Upload Guidelines">
+                                </div>
+                                <div class="guide-content">
+                                    <h3>Comic upload guidelines</h3>
+                                    <p>Check out WebComics upload guidelines before you create excellent works!</p>
+                                </div>
+                            </div>
+
+                            <!-- Guide Item 4 -->
+                            <div class="guide-item">
+                                <div class="guide-image">
+                                    <img src="assets/publish images/4.png" alt="Incentive Packs">
+                                </div>
+                                <div class="guide-content">
+                                    <h3>Get incentive packs!</h3>
+                                    <p>What's inside the incentive Packages? How can I benefit from them?</p>
+                                </div>
+                            </div>
+
+                            <!-- Guide Item 5 -->
+                            <div class="guide-item">
+                                <div class="guide-image">
+                                    <img src="assets/publish images/5.png" alt="Quick Upgrades">
+                                </div>
+                                <div class="guide-content">
+                                    <h3>Tips on quick upgrades!</h3>
+                                    <p>Tips to help you upgrade your Creator Level and get creator's rights faster!</p>
+                                </div>
+                            </div>
+
+                            <!-- Guide Item 6 -->
+                            <div class="guide-item">
+                                <div class="guide-image">
+                                    <img src="assets/publish images/6.png" alt="More Guides">
+                                </div>
+                                <div class="guide-content">
+                                    <h3>More to come</h3>
+                                    <p>Stay tuned for more upcoming tips & guides!</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <p>&copy; 2025 Toonzy. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+</body>
+</html>
