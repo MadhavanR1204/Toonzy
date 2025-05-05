@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reading: The Necromancer Chapter 1 - Toonzy</title>
+    <link rel="stylesheet" href="css/normalize.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+</head>
+<body class="reader-page">
+    <!-- Reader Header -->
+    <header class="reader-header">
+        <div class="container">
+            <div class="reader-nav">
+                <a href="comic-detail.html" class="btn-back">
+                    <img src="assets/images/icons/arrow-left.svg" alt="Back">
+                    Back
+                </a>
+                <div class="comic-info">
+                    <h1>The Necromancer: Chapter 1</h1>
+                </div>
+                <div class="reader-controls">
+                    <button class="btn-prev" id="prevPage">
+                        <img src="assets/images/icons/chevron-left.svg" alt="Previous">
+                    </button>
+                    <div class="page-info">
+                        Page <span id="currentPage">1</span> of <span id="totalPages">0</span>
+                    </div>
+                    <button class="btn-next" id="nextPage">
+                        <img src="assets/images/icons/chevron-right.svg" alt="Next">
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- PDF Reader Content -->
+    <section class="reader-content">
+        <div class="container">
+            <div class="pdf-container" id="pdfContainer">
+                <!-- PDF pages will be inserted here as vertical scrolling content -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Reader Footer -->
+    <footer class="reader-footer">
+        <div class="container">
+            <div class="navigation-controls">
+                <button class="btn-chapter" id="prevChapter">Previous Chapter</button>
+                <button class="btn-chapter" id="nextChapter">Next Chapter</button>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/pdf-viewer.js"></script>
+    <script src="js/pdf-viewer.js"></script>
+</body>
+</html>
