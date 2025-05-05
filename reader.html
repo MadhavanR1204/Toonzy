@@ -2,12 +2,109 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Reading: The Necromancer Chapter 1 - Toonzy</title>
     <link rel="stylesheet" href="css/normalize.css">
     <link rel="stylesheet" href="css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+    <!-- Add mobile-specific styles -->
+    <style>
+        /* Reader-specific mobile improvements */
+        @media (max-width: 768px) {
+            .reader-header {
+                padding: 10px 0;
+            }
+            
+            .reader-nav {
+                gap: 10px;
+            }
+            
+            .comic-info h1 {
+                font-size: 1rem;
+            }
+            
+            .btn-back {
+                padding: 6px 12px;
+                font-size: 0.9rem;
+            }
+            
+            .page-info {
+                font-size: 0.8rem;
+            }
+            
+            .btn-prev, .btn-next {
+                width: 32px;
+                height: 32px;
+            }
+            
+            .btn-prev img, .btn-next img {
+                width: 16px;
+                height: 16px;
+            }
+            
+            .reader-content {
+                padding: 15px 0;
+            }
+            
+            .pdf-page {
+                touch-action: pan-y pinch-zoom;
+            }
+            
+            .btn-chapter {
+                padding: 8px 12px;
+                font-size: 0.9rem;
+            }
+            
+            /* Touch-friendly controls */
+            .pdf-container {
+                -webkit-overflow-scrolling: touch;
+            }
+        }
+        
+        /* Add specific loading styles */
+        .pdf-loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 300px;
+            color: #fff;
+            text-align: center;
+        }
+        
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: #38b7a9;
+            animation: spin 1s ease-in-out infinite;
+            margin-bottom: 15px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Add accessibility improvements */
+        .reader-controls button {
+            min-width: 44px;
+            min-height: 44px;
+        }
+        
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+    </style>
 </head>
 <body class="reader-page">
     <!-- Reader Header -->
@@ -16,20 +113,22 @@
             <div class="reader-nav">
                 <a href="comic-detail.html" class="btn-back">
                     <img src="assets/images/icons/arrow-left.svg" alt="Back">
-                    Back
+                    <span>Back</span>
                 </a>
                 <div class="comic-info">
                     <h1>The Necromancer: Chapter 1</h1>
                 </div>
                 <div class="reader-controls">
-                    <button class="btn-prev" id="prevPage">
-                        <img src="assets/images/icons/chevron-left.svg" alt="Previous">
+                    <button class="btn-prev" id="prevPage" aria-label="Previous Page">
+                        <img src="assets/images/icons/chevron-left.svg" alt="">
+                        <span class="sr-only">Previous Page</span>
                     </button>
                     <div class="page-info">
                         Page <span id="currentPage">1</span> of <span id="totalPages">0</span>
                     </div>
-                    <button class="btn-next" id="nextPage">
-                        <img src="assets/images/icons/chevron-right.svg" alt="Next">
+                    <button class="btn-next" id="nextPage" aria-label="Next Page">
+                        <img src="assets/images/icons/chevron-right.svg" alt="">
+                        <span class="sr-only">Next Page</span>
                     </button>
                 </div>
             </div>
@@ -41,6 +140,11 @@
         <div class="container">
             <div class="pdf-container" id="pdfContainer">
                 <!-- PDF pages will be inserted here as vertical scrolling content -->
+                <!-- Loading indicator will be shown initially -->
+                <div id="pdf-loading" class="pdf-loading">
+                    <div class="spinner"></div>
+                    <p>Loading comic...</p>
+                </div>
             </div>
         </div>
     </section>
@@ -55,7 +159,41 @@
         </div>
     </footer>
 
-    <script src="js/pdf-viewer.js"></script>
+    <!-- Mobile reader instructions (shown only on first visit) -->
+    <div id="mobile-instructions" style="display: none;">
+        <div style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); z-index: 9999; display: flex; align-items: center; justify-content: center;">
+            <div style="background: white; color: #333; max-width: 80%; padding: 20px; border-radius: 15px; text-align: center;">
+                <h3 style="margin-top: 0;">Reading Tips</h3>
+                <ul style="text-align: left; padding-left: 20px;">
+                    <li>Scroll down to read through pages</li>
+                    <li>Double-tap to zoom in/out</li>
+                    <li>Swipe left/right to change pages</li>
+                    <li>Use the buttons at bottom-right to quickly navigate</li>
+                </ul>
+                <button id="got-it" style="background: #38b7a9; color: white; border: none; padding: 10px 20px; border-radius: 20px; margin-top: 10px;">Got it!</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Check if this is the first visit to the reader page
+        document.addEventListener('DOMContentLoaded', function() {
+            // Only show instructions on mobile devices
+            if (window.innerWidth < 768) {
+                const hasSeenInstructions = localStorage.getItem('toonzy-reader-instructions');
+                
+                if (!hasSeenInstructions) {
+                    document.getElementById('mobile-instructions').style.display = 'block';
+                    
+                    document.getElementById('got-it').addEventListener('click', function() {
+                        document.getElementById('mobile-instructions').style.display = 'none';
+                        localStorage.setItem('toonzy-reader-instructions', 'true');
+                    });
+                }
+            }
+        });
+    </script>
+
     <script src="js/pdf-viewer.js"></script>
 </body>
 </html>

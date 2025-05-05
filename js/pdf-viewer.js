@@ -1,6 +1,6 @@
 /**
  * PDF Viewer Implementation for Toonzy
- * This script handles the continuous scrolling manga-style reader
+ * This script handles the continuous scrolling manga-style reader with improved mobile support
  */
 
 // Initialize PDF.js
@@ -24,11 +24,13 @@ class MangaReader {
         this.pageRendering = false;
         this.pageNumPending = null;
         this.scale = options.scale || 1.5;
+        this.mobileScale = options.mobileScale || 1.0; // Separate scale for mobile
         this.continuousMode = true; // Always use continuous mode for vertical scrolling
         this.pageGap = options.pageGap || 20;
         this.pagesRendered = [];
         this.observers = [];
         this.visiblePage = 1;
+        this.isMobile = window.innerWidth < 768;
         
         // Initialize UI elements
         this.pageCountElem = document.getElementById('totalPages');
@@ -40,9 +42,16 @@ class MangaReader {
         
         // Initialize reader
         this.init();
+        
+        // Listen for orientation changes or window resizing
+        window.addEventListener('resize', this.handleResize.bind(this));
+        window.addEventListener('orientationchange', this.handleResize.bind(this));
     }
     
     init() {
+        // Apply correct scale based on device
+        this.updateScale();
+        
         // Load PDF
         this.loadPdf();
         
@@ -55,7 +64,38 @@ class MangaReader {
         }
     }
     
+    updateScale() {
+        // Determine if we're on mobile and set appropriate scale
+        this.isMobile = window.innerWidth < 768;
+        this.currentScale = this.isMobile ? this.mobileScale : this.scale;
+        
+        // If we've already rendered pages, re-render them with the new scale
+        if (this.pdfDoc && this.pagesRendered.length > 0) {
+            this.renderContinuous();
+        }
+    }
+    
+    handleResize() {
+        // Throttle the resize event to prevent excessive re-renders
+        if (this.resizeTimeout) {
+            clearTimeout(this.resizeTimeout);
+        }
+        
+        this.resizeTimeout = setTimeout(() => {
+            const wasMobile = this.isMobile;
+            this.isMobile = window.innerWidth < 768;
+            
+            // Only update scale if we've crossed the mobile threshold
+            if (wasMobile !== this.isMobile) {
+                this.updateScale();
+            }
+        }, 300);
+    }
+    
     loadPdf() {
+        // Show loading indicator
+        this.showLoadingIndicator();
+        
         // Load the PDF document
         const loadingTask = pdfjsLib.getDocument(this.pdfUrl);
         
@@ -74,25 +114,95 @@ class MangaReader {
             } else {
                 this.renderPage(this.currentPage);
             }
+            
+            // Hide loading indicator
+            this.hideLoadingIndicator();
         }).catch(error => {
             console.error('Error loading PDF:', error);
             this.renderPlaceholder();
+            this.hideLoadingIndicator();
         });
+    }
+    
+    showLoadingIndicator() {
+        // Create loading indicator if it doesn't exist
+        if (!document.getElementById('pdf-loading')) {
+            const loadingDiv = document.createElement('div');
+            loadingDiv.id = 'pdf-loading';
+            loadingDiv.classList.add('pdf-loading');
+            loadingDiv.innerHTML = '<div class="spinner"></div><p>Loading comic...</p>';
+            
+            // Add loading indicator styles if they don't exist
+            if (!document.getElementById('loading-styles')) {
+                const style = document.createElement('style');
+                style.id = 'loading-styles';
+                style.textContent = `
+                    .pdf-loading {
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                        justify-content: center;
+                        height: 300px;
+                        color: #fff;
+                        text-align: center;
+                    }
+                    .spinner {
+                        width: 40px;
+                        height: 40px;
+                        border: 4px solid rgba(255,255,255,0.3);
+                        border-radius: 50%;
+                        border-top-color: #38b7a9;
+                        animation: spin 1s ease-in-out infinite;
+                        margin-bottom: 15px;
+                    }
+                    @keyframes spin {
+                        to { transform: rotate(360deg); }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+            
+            // Add loading indicator to container
+            this.container.appendChild(loadingDiv);
+        }
+    }
+    
+    hideLoadingIndicator() {
+        const loadingElement = document.getElementById('pdf-loading');
+        if (loadingElement) {
+            loadingElement.remove();
+        }
     }
     
     renderPlaceholder() {
         // Create a placeholder when PDF loading fails
-        this.container.width = 800;
-        this.container.height = 1200;
-        this.ctx.fillStyle = '#f5f5f5';
-        this.ctx.fillRect(0, 0, this.container.width, this.container.height);
+        this.container.innerHTML = '';
+        const placeholderDiv = document.createElement('div');
+        placeholderDiv.style.width = '100%';
+        placeholderDiv.style.height = '300px';
+        placeholderDiv.style.backgroundColor = '#f5f5f5';
+        placeholderDiv.style.display = 'flex';
+        placeholderDiv.style.flexDirection = 'column';
+        placeholderDiv.style.alignItems = 'center';
+        placeholderDiv.style.justifyContent = 'center';
+        placeholderDiv.style.borderRadius = '15px';
         
-        this.ctx.fillStyle = '#333';
-        this.ctx.font = '24px Poppins, sans-serif';
-        this.ctx.textAlign = 'center';
-        this.ctx.fillText('Comic Preview Not Available', this.container.width / 2, this.container.height / 2);
-        this.ctx.font = '16px Poppins, sans-serif';
-        this.ctx.fillText('Page ' + this.currentPage, this.container.width / 2, this.container.height / 2 + 30);
+        const text1 = document.createElement('div');
+        text1.textContent = 'Comic Preview Not Available';
+        text1.style.color = '#333';
+        text1.style.fontSize = '24px';
+        text1.style.fontFamily = 'Poppins, sans-serif';
+        text1.style.marginBottom = '10px';
+        
+        const text2 = document.createElement('div');
+        text2.textContent = 'Page ' + this.currentPage;
+        text2.style.color = '#333';
+        text2.style.fontSize = '16px';
+        text2.style.fontFamily = 'Poppins, sans-serif';
+        
+        placeholderDiv.appendChild(text1);
+        placeholderDiv.appendChild(text2);
+        this.container.appendChild(placeholderDiv);
         
         if (this.currentPageElem) {
             this.currentPageElem.textContent = this.currentPage;
@@ -102,47 +212,16 @@ class MangaReader {
         }
     }
     
-    renderPage(num) {
-        this.pageRendering = true;
-        
-        // Using promise to fetch the page
-        this.pdfDoc.getPage(num).then(page => {
-            const viewport = page.getViewport({scale: this.scale});
-            this.container.height = viewport.height;
-            this.container.width = viewport.width;
-            
-            // Render PDF page into canvas context
-            const renderContext = {
-                canvasContext: this.ctx,
-                viewport: viewport
-            };
-            
-            const renderTask = page.render(renderContext);
-            
-            // Wait for rendering to finish
-            renderTask.promise.then(() => {
-                this.pageRendering = false;
-                
-                if (this.pageNumPending !== null) {
-                    // New page rendering is pending
-                    this.renderPage(this.pageNumPending);
-                    this.pageNumPending = null;
-                }
-            });
-        });
-        
-        // Update page counter
-        if (this.currentPageElem) {
-            this.currentPageElem.textContent = num;
-        }
-    }
-    
     renderContinuous() {
         // For continuous mode, we need a container to hold multiple canvases
         const pdfContainer = document.querySelector('.pdf-container');
         
         // Clear the container first
         pdfContainer.innerHTML = '';
+        this.pagesRendered = [];
+        
+        // Set the appropriate scale based on device
+        const renderScale = this.isMobile ? this.mobileScale : this.scale;
         
         // Create and append canvases for each page in vertical arrangement
         for (let pageNum = 1; pageNum <= this.totalPages; pageNum++) {
@@ -169,19 +248,27 @@ class MangaReader {
             pdfContainer.appendChild(pageContainer);
             
             // Render the page content
-            this.renderPageToCanvas(pageNum, canvas);
+            this.renderPageToCanvas(pageNum, canvas, renderScale);
         }
+        
+        // Add double-tap feature for zooming on touch devices
+        this.setupDoubleTapZoom();
         
         // Set up scroll detection for current page
         this.setupScrollDetection();
+        
+        // Add swipe detection for mobile
+        this.setupSwipeDetection();
         
         window.VIEWER_READY = true;
         console.log('Manga reader ready with vertical scrolling');
     }
     
-    renderPageToCanvas(pageNum, canvas) {
+    renderPageToCanvas(pageNum, canvas, scale = null) {
+        const renderScale = scale || (this.isMobile ? this.mobileScale : this.scale);
+        
         this.pdfDoc.getPage(pageNum).then(page => {
-            const viewport = page.getViewport({scale: this.scale});
+            const viewport = page.getViewport({ scale: renderScale });
             canvas.height = viewport.height;
             canvas.width = viewport.width;
             const context = canvas.getContext('2d');
@@ -191,8 +278,11 @@ class MangaReader {
                 viewport: viewport
             };
             
-            page.render(renderContext);
-            this.pagesRendered.push(pageNum);
+            page.render(renderContext).promise.then(() => {
+                if (!this.pagesRendered.includes(pageNum)) {
+                    this.pagesRendered.push(pageNum);
+                }
+            });
         });
     }
     
@@ -203,6 +293,12 @@ class MangaReader {
             rootMargin: '0px',
             threshold: 0.5 // Trigger when 50% of the element is visible
         };
+        
+        // Clear previous observers if they exist
+        if (this.observers.length) {
+            this.observers.forEach(observer => observer.disconnect());
+            this.observers = [];
+        }
         
         const observer = new IntersectionObserver(entries => {
             entries.forEach(entry => {
@@ -230,6 +326,85 @@ class MangaReader {
         window.addEventListener('scroll', () => {
             this.checkVisiblePages();
         });
+    }
+    
+    setupDoubleTapZoom() {
+        // Skip if not a touch device
+        if (!('ontouchstart' in window)) return;
+        
+        const pages = document.querySelectorAll('.pdf-page');
+        let lastTap = 0;
+        let zoomedPage = null;
+        
+        pages.forEach(page => {
+            page.addEventListener('touchend', (e) => {
+                const currentTime = new Date().getTime();
+                const tapLength = currentTime - lastTap;
+                
+                if (tapLength < 500 && tapLength > 0) {
+                    // Double tap detected
+                    e.preventDefault();
+                    
+                    if (zoomedPage === page) {
+                        // Reset zoom
+                        page.style.transform = 'scale(1)';
+                        page.style.transformOrigin = 'center center';
+                        zoomedPage = null;
+                    } else {
+                        // Reset any currently zoomed page
+                        if (zoomedPage) {
+                            zoomedPage.style.transform = 'scale(1)';
+                        }
+                        
+                        // Calculate touch position for zoom center
+                        const touch = e.changedTouches[0];
+                        const rect = page.getBoundingClientRect();
+                        const offsetX = ((touch.clientX - rect.left) / rect.width) * 100;
+                        const offsetY = ((touch.clientY - rect.top) / rect.height) * 100;
+                        
+                        // Apply zoom
+                        page.style.transformOrigin = `${offsetX}% ${offsetY}%`;
+                        page.style.transform = 'scale(1.5)';
+                        zoomedPage = page;
+                    }
+                }
+                
+                lastTap = currentTime;
+            });
+        });
+    }
+    
+    setupSwipeDetection() {
+        // Skip if not a touch device
+        if (!('ontouchstart' in window)) return;
+        
+        let startX, startY;
+        const threshold = 50; // Minimum distance for swipe
+        const restraint = 100; // Maximum perpendicular distance
+        
+        document.addEventListener('touchstart', (e) => {
+            startX = e.touches[0].clientX;
+            startY = e.touches[0].clientY;
+        }, { passive: true });
+        
+        document.addEventListener('touchend', (e) => {
+            const endX = e.changedTouches[0].clientX;
+            const endY = e.changedTouches[0].clientY;
+            
+            const distX = endX - startX;
+            const distY = endY - startY;
+            
+            // Detect horizontal swipe (only if vertical movement is limited)
+            if (Math.abs(distX) >= threshold && Math.abs(distY) <= restraint) {
+                if (distX > 0) {
+                    // Right swipe - previous page
+                    this.goPrevPage();
+                } else {
+                    // Left swipe - next page
+                    this.goNextPage();
+                }
+            }
+        }, { passive: true });
     }
     
     checkVisiblePages() {
@@ -271,25 +446,23 @@ class MangaReader {
         }
     }
     
-    queueRenderPage(num) {
-        if (this.pageRendering) {
-            this.pageNumPending = num;
-        } else {
-            this.renderPage(num);
-        }
-    }
-    
     goPrevPage() {
         if (this.currentPage <= 1) {
+            // At first page, possibly navigate to previous chapter
+            const prevChapterBtn = document.getElementById('prevChapter');
+            if (prevChapterBtn) {
+                prevChapterBtn.click();
+            }
             return;
         }
+        
         this.currentPage--;
         
         // Scroll to the previous page with smooth animation
         const prevPage = document.getElementById(`page-${this.currentPage}`);
         if (prevPage) {
             // Calculate position to scroll to (top of the page minus a small offset)
-            const offset = 80; // Height of the header
+            const offset = this.isMobile ? 60 : 80; // Smaller offset for mobile
             const rect = prevPage.getBoundingClientRect();
             const scrollTop = window.pageYOffset + rect.top - offset;
             
@@ -303,15 +476,21 @@ class MangaReader {
     
     goNextPage() {
         if (this.currentPage >= this.totalPages) {
+            // At last page, possibly navigate to next chapter
+            const nextChapterBtn = document.getElementById('nextChapter');
+            if (nextChapterBtn) {
+                nextChapterBtn.click();
+            }
             return;
         }
+        
         this.currentPage++;
         
         // Scroll to the next page with smooth animation
         const nextPage = document.getElementById(`page-${this.currentPage}`);
         if (nextPage) {
             // Calculate position to scroll to (top of the page minus a small offset)
-            const offset = 80; // Height of the header
+            const offset = this.isMobile ? 60 : 80; // Smaller offset for mobile
             const rect = nextPage.getBoundingClientRect();
             const scrollTop = window.pageYOffset + rect.top - offset;
             
@@ -364,11 +543,14 @@ class MangaReader {
 document.addEventListener('DOMContentLoaded', () => {
     // Only initialize on the reader page
     if (document.getElementById('pdfContainer')) {
+        const isMobile = window.innerWidth < 768;
+        
         const reader = new MangaReader({
             pdfUrl: 'assets/dummy.pdf',
             container: document.getElementById('pdfContainer'),
-            scale: 1.5,
-            pageGap: 30, // Increase gap between pages for better separation
+            scale: 1.5, // Desktop scale
+            mobileScale: 1.0, // Mobile scale (smaller to fit screen better)
+            pageGap: isMobile ? 15 : 30, // Smaller gap for mobile
         });
         
         // Add a small delay to ensure smooth first-load experience
@@ -379,5 +561,89 @@ document.addEventListener('DOMContentLoaded', () => {
                 behavior: 'auto'
             });
         }, 200);
+        
+        // Add fixed position navigation buttons for better mobile experience
+        if (isMobile) {
+            addMobileNavButtons();
+        }
     }
 });
+
+// Add floating navigation buttons for easier mobile navigation
+function addMobileNavButtons() {
+    // First check if these buttons already exist
+    if (document.getElementById('mobile-nav-buttons')) return;
+    
+    const navButtons = document.createElement('div');
+    navButtons.id = 'mobile-nav-buttons';
+    navButtons.style.position = 'fixed';
+    navButtons.style.bottom = '80px';
+    navButtons.style.right = '20px';
+    navButtons.style.zIndex = '999';
+    navButtons.style.display = 'flex';
+    navButtons.style.flexDirection = 'column';
+    navButtons.style.gap = '10px';
+    
+    // Button to scroll to top
+    const topButton = document.createElement('button');
+    topButton.innerHTML = '↑';
+    topButton.style.width = '40px';
+    topButton.style.height = '40px';
+    topButton.style.borderRadius = '50%';
+    topButton.style.backgroundColor = '#38b7a9';
+    topButton.style.color = 'white';
+    topButton.style.border = 'none';
+    topButton.style.fontSize = '20px';
+    topButton.style.display = 'flex';
+    topButton.style.alignItems = 'center';
+    topButton.style.justifyContent = 'center';
+    topButton.style.boxShadow = '0 2px 5px rgba(0,0,0,0.3)';
+    
+    topButton.addEventListener('click', () => {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    });
+    
+    // Button to scroll to bottom
+    const bottomButton = document.createElement('button');
+    bottomButton.innerHTML = '↓';
+    bottomButton.style.width = '40px';
+    bottomButton.style.height = '40px';
+    bottomButton.style.borderRadius = '50%';
+    bottomButton.style.backgroundColor = '#38b7a9';
+    bottomButton.style.color = 'white';
+    bottomButton.style.border = 'none';
+    bottomButton.style.fontSize = '20px';
+    bottomButton.style.display = 'flex';
+    bottomButton.style.alignItems = 'center';
+    bottomButton.style.justifyContent = 'center';
+    bottomButton.style.boxShadow = '0 2px 5px rgba(0,0,0,0.3)';
+    
+    bottomButton.addEventListener('click', () => {
+        window.scrollTo({
+            top: document.body.scrollHeight,
+            behavior: 'smooth'
+        });
+    });
+    
+    navButtons.appendChild(topButton);
+    navButtons.appendChild(bottomButton);
+    document.body.appendChild(navButtons);
+    
+    // Hide buttons when at top or bottom of page
+    window.addEventListener('scroll', () => {
+        if (window.scrollY < 100) {
+            topButton.style.opacity = '0.3';
+        } else {
+            topButton.style.opacity = '1';
+        }
+        
+        if (window.scrollY + window.innerHeight > document.body.scrollHeight - 100) {
+            bottomButton.style.opacity = '0.3';
+        } else {
+            bottomButton.style.opacity = '1';
+        }
+    });
+}
