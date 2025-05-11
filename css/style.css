@@ -2,9 +2,9 @@
    Base Styles
    ============================== */
    :root {
-    --primary-color: #38b7a9;
-    --primary-dark: #32a799;
-    --primary-light: #3ec5b7;
+    --primary-color: rgb(37, 126, 227);
+    --primary-dark: rgb(37, 126, 227);
+    --primary-light: rgb(37, 126, 227);
     --secondary-color: #ffa500;
     --text-color: #333;
     --light-text: #777;
