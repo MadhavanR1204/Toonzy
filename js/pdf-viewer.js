@@ -1,6 +1,6 @@
 /**
  * PDF Viewer Implementation for Toonzy
- * This script handles the continuous scrolling manga-style reader with improved mobile support
+ * This script handles the continuous scrolling manga-style reader with improved chapter navigation
  */
 
 // Initialize PDF.js
@@ -16,7 +16,11 @@ if (typeof pdfjsLib === 'undefined') {
 
 class MangaReader {
     constructor(options) {
-        this.pdfUrl = options.pdfUrl || 'assets/dummy.pdf';
+        // Get chapter from URL parameters
+        this.currentChapter = this.getChapterFromUrl() || 1;
+        this.totalChapters = 8; // Hardcoded total chapters (ch1.pdf to ch8.pdf)
+        
+        this.pdfUrl = `assets/pdfs/ch${this.currentChapter}.pdf`;
         this.container = options.container || document.getElementById('pdfContainer');
         this.currentPage = 1;
         this.totalPages = 0;
@@ -40,12 +44,30 @@ class MangaReader {
         this.prevChapterBtn = document.getElementById('prevChapter');
         this.nextChapterBtn = document.getElementById('nextChapter');
         
+        // Update chapter title
+        this.updateChapterTitle();
+        
         // Initialize reader
         this.init();
         
         // Listen for orientation changes or window resizing
         window.addEventListener('resize', this.handleResize.bind(this));
         window.addEventListener('orientationchange', this.handleResize.bind(this));
+    }
+    
+    // Get chapter number from URL parameters
+    getChapterFromUrl() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const chapter = urlParams.get('chapter');
+        return chapter ? parseInt(chapter, 10) : null;
+    }
+    
+    // Update the chapter title in the header
+    updateChapterTitle() {
+        const titleElement = document.querySelector('.comic-info h1');
+        if (titleElement) {
+            titleElement.textContent = `The Necromancer: Chapter ${this.currentChapter}`;
+        }
     }
     
     init() {
@@ -61,6 +83,32 @@ class MangaReader {
         // Set up scroll observer for continuous mode
         if (this.continuousMode) {
             this.setupIntersectionObserver();
+        }
+        
+        // Update chapter navigation buttons state
+        this.updateChapterNavigationButtons();
+    }
+    
+    // Update chapter navigation buttons (disable if at first or last chapter)
+    updateChapterNavigationButtons() {
+        if (this.prevChapterBtn) {
+            if (this.currentChapter <= 1) {
+                this.prevChapterBtn.disabled = true;
+                this.prevChapterBtn.classList.add('disabled');
+            } else {
+                this.prevChapterBtn.disabled = false;
+                this.prevChapterBtn.classList.remove('disabled');
+            }
+        }
+        
+        if (this.nextChapterBtn) {
+            if (this.currentChapter >= this.totalChapters) {
+                this.nextChapterBtn.disabled = true;
+                this.nextChapterBtn.classList.add('disabled');
+            } else {
+                this.nextChapterBtn.disabled = false;
+                this.nextChapterBtn.classList.remove('disabled');
+            }
         }
     }
     
@@ -132,36 +180,6 @@ class MangaReader {
             loadingDiv.classList.add('pdf-loading');
             loadingDiv.innerHTML = '<div class="spinner"></div><p>Loading comic...</p>';
             
-            // Add loading indicator styles if they don't exist
-            if (!document.getElementById('loading-styles')) {
-                const style = document.createElement('style');
-                style.id = 'loading-styles';
-                style.textContent = `
-                    .pdf-loading {
-                        display: flex;
-                        flex-direction: column;
-                        align-items: center;
-                        justify-content: center;
-                        height: 300px;
-                        color: #fff;
-                        text-align: center;
-                    }
-                    .spinner {
-                        width: 40px;
-                        height: 40px;
-                        border: 4px solid rgba(255,255,255,0.3);
-                        border-radius: 50%;
-                        border-top-color: #38b7a9;
-                        animation: spin 1s ease-in-out infinite;
-                        margin-bottom: 15px;
-                    }
-                    @keyframes spin {
-                        to { transform: rotate(360deg); }
-                    }
-                `;
-                document.head.appendChild(style);
-            }
-            
             // Add loading indicator to container
             this.container.appendChild(loadingDiv);
         }
@@ -195,7 +213,7 @@ class MangaReader {
         text1.style.marginBottom = '10px';
         
         const text2 = document.createElement('div');
-        text2.textContent = 'Page ' + this.currentPage;
+        text2.textContent = 'Chapter ' + this.currentChapter + ', Page ' + this.currentPage;
         text2.style.color = '#333';
         text2.style.fontSize = '16px';
         text2.style.fontFamily = 'Poppins, sans-serif';
@@ -449,9 +467,8 @@ class MangaReader {
     goPrevPage() {
         if (this.currentPage <= 1) {
             // At first page, possibly navigate to previous chapter
-            const prevChapterBtn = document.getElementById('prevChapter');
-            if (prevChapterBtn) {
-                prevChapterBtn.click();
+            if (this.currentChapter > 1) {
+                this.goToPrevChapter();
             }
             return;
         }
@@ -477,9 +494,8 @@ class MangaReader {
     goNextPage() {
         if (this.currentPage >= this.totalPages) {
             // At last page, possibly navigate to next chapter
-            const nextChapterBtn = document.getElementById('nextChapter');
-            if (nextChapterBtn) {
-                nextChapterBtn.click();
+            if (this.currentChapter < this.totalChapters) {
+                this.goToNextChapter();
             }
             return;
         }
@@ -499,6 +515,20 @@ class MangaReader {
                 top: scrollTop,
                 behavior: 'smooth'
             });
+        }
+    }
+    
+    // Method to go to previous chapter
+    goToPrevChapter() {
+        if (this.currentChapter > 1) {
+            window.location.href = `reader.html?chapter=${this.currentChapter - 1}`;
+        }
+    }
+    
+    // Method to go to next chapter
+    goToNextChapter() {
+        if (this.currentChapter < this.totalChapters) {
+            window.location.href = `reader.html?chapter=${this.currentChapter + 1}`;
         }
     }
     
@@ -522,18 +552,21 @@ class MangaReader {
             }
         });
         
-        // Chapter navigation (would be implemented with actual chapter data)
+        // Previous chapter button
         if (this.prevChapterBtn) {
             this.prevChapterBtn.addEventListener('click', () => {
-                // In a real implementation, this would navigate to the previous chapter
-                alert('Previous chapter would be loaded here');
+                if (this.currentChapter > 1) {
+                    this.goToPrevChapter();
+                }
             });
         }
         
+        // Next chapter button
         if (this.nextChapterBtn) {
             this.nextChapterBtn.addEventListener('click', () => {
-                // In a real implementation, this would navigate to the next chapter
-                alert('Next chapter would be loaded here');
+                if (this.currentChapter < this.totalChapters) {
+                    this.goToNextChapter();
+                }
             });
         }
     }
@@ -546,7 +579,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const isMobile = window.innerWidth < 768;
         
         const reader = new MangaReader({
-            pdfUrl: 'assets/dummy.pdf',
             container: document.getElementById('pdfContainer'),
             scale: 1.5, // Desktop scale
             mobileScale: 1.0, // Mobile scale (smaller to fit screen better)
@@ -566,6 +598,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (isMobile) {
             addMobileNavButtons();
         }
+        
+        // Add styles for disabled buttons
+        addDisabledButtonStyles();
     }
 });
 
@@ -646,4 +681,17 @@ function addMobileNavButtons() {
             bottomButton.style.opacity = '1';
         }
     });
+}
+
+// Add styles for disabled chapter navigation buttons
+function addDisabledButtonStyles() {
+    const style = document.createElement('style');
+    style.textContent = `
+        .btn-chapter.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background-color: #888;
+        }
+    `;
+    document.head.appendChild(style);
 }

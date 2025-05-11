@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Reading: The Necromancer Chapter 1 - Toonzy</title>
+    <title>Reading: The Necromancer - Toonzy</title>
     <link rel="stylesheet" href="css/normalize.css">
     <link rel="stylesheet" href="css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -104,6 +104,13 @@
             white-space: nowrap;
             border: 0;
         }
+        
+        /* Styles for disabled chapter buttons */
+        .btn-chapter.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background-color: #888;
+        }
     </style>
 </head>
 <body class="reader-page">
@@ -191,6 +198,11 @@
                     });
                 }
             }
+            
+            // Set page title based on chapter
+            const urlParams = new URLSearchParams(window.location.search);
+            const chapter = urlParams.get('chapter') || 1;
+            document.title = `Reading: The Necromancer Chapter ${chapter} - Toonzy`;
         });
     </script>
 
