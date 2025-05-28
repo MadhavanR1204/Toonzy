@@ -136,33 +136,42 @@
                                         <span class="chapter-date">2025-02-12</span>
                                     </div>
                                 </a>
-                                <a href="reader.html?chapter=6" class="chapter-item">
+                                <div class="chapter-item locked" data-chapter="6">
                                     <div class="chapter-thumb">
                                         <img src="assets/images/1.png" alt="Chapter 6">
+                                        <div class="lock-overlay">
+                                            <img src="assets/images/icons/lock.svg" alt="Locked" class="lock-icon">
+                                        </div>
                                     </div>
                                     <div class="chapter-info">
                                         <span class="chapter-number">Ch.6</span>
                                         <span class="chapter-date">2025-02-12</span>
                                     </div>
-                                </a>
-                                <a href="reader.html?chapter=7" class="chapter-item">
+                                </div>
+                                <div class="chapter-item locked" data-chapter="7">
                                     <div class="chapter-thumb">
                                         <img src="assets/images/1.png" alt="Chapter 7">
+                                        <div class="lock-overlay">
+                                            <img src="assets/images/icons/lock.svg" alt="Locked" class="lock-icon">
+                                        </div>
                                     </div>
                                     <div class="chapter-info">
                                         <span class="chapter-number">Ch.7</span>
                                         <span class="chapter-date">2025-02-12</span>
                                     </div>
-                                </a>
-                                <a href="reader.html?chapter=8" class="chapter-item">
+                                </div>
+                                <div class="chapter-item locked" data-chapter="8">
                                     <div class="chapter-thumb">
                                         <img src="assets/images/1.png" alt="Chapter 8">
+                                        <div class="lock-overlay">
+                                            <img src="assets/images/icons/lock.svg" alt="Locked" class="lock-icon">
+                                        </div>
                                     </div>
                                     <div class="chapter-info">
                                         <span class="chapter-number">Ch.8</span>
                                         <span class="chapter-date">2025-02-12</span>
                                     </div>
-                                </a>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -240,6 +249,18 @@
             </div>
         </div>
     </footer>
+
+    <!-- Purchase Modal -->
+    <div id="purchaseModal" class="modal">
+        <div class="modal-content">
+            <h3>Do you wish to purchase the chapter using coins?</h3>
+            <div class="modal-buttons">
+                <button id="modalNo" class="btn-modal btn-no">No</button>
+                <button id="modalYes" class="btn-modal btn-yes">Yes</button>
+            </div>
+        </div>
+    </div>
+    <div id="modalOverlay" class="modal-overlay"></div>
 
     <script src="js/main.js"></script>
 </body>

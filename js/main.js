@@ -328,3 +328,72 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
+// Handle locked chapters and purchase modal
+document.addEventListener('DOMContentLoaded', function() {
+    const lockedChapters = document.querySelectorAll('.chapter-item.locked');
+    const modal = document.getElementById('purchaseModal');
+    const modalOverlay = document.getElementById('modalOverlay');
+    const modalYes = document.getElementById('modalYes');
+    const modalNo = document.getElementById('modalNo');
+    let currentChapter = null;
+    
+    // Add click event listeners to locked chapters
+    lockedChapters.forEach(chapter => {
+        chapter.addEventListener('click', function() {
+            currentChapter = this.getAttribute('data-chapter');
+            showModal();
+        });
+    });
+    
+    // Show modal function
+    function showModal() {
+        if (modal && modalOverlay) {
+            modal.classList.add('show');
+            modalOverlay.classList.add('show');
+            document.body.style.overflow = 'hidden'; // Prevent background scrolling
+        }
+    }
+    
+    // Hide modal function
+    function hideModal() {
+        if (modal && modalOverlay) {
+            modal.classList.remove('show');
+            modalOverlay.classList.remove('show');
+            document.body.style.overflow = 'auto'; // Restore scrolling
+            currentChapter = null;
+        }
+    }
+    
+    // Handle "Yes" button click
+    if (modalYes) {
+        modalYes.addEventListener('click', function() {
+            if (currentChapter) {
+                // Redirect to the reading page for the purchased chapter
+                window.location.href = `reader.html?chapter=${currentChapter}`;
+            }
+            hideModal();
+        });
+    }
+    
+    // Handle "No" button click
+    if (modalNo) {
+        modalNo.addEventListener('click', function() {
+            hideModal();
+        });
+    }
+    
+    // Handle overlay click to close modal
+    if (modalOverlay) {
+        modalOverlay.addEventListener('click', function() {
+            hideModal();
+        });
+    }
+    
+    // Handle escape key to close modal
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && modal && modal.classList.contains('show')) {
+            hideModal();
+        }
+    });
+});
