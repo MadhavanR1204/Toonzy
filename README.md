@@ -48,7 +48,7 @@ Toonzy is a modern, responsive web application for reading manga and comics onli
 ├── reader.html         # Manga/comic reading interface
 ├── profile.html        # User profile management
 ├── library.html        # Personal comic library
-└── publish.html        # Creator dashboard
+└── publish.html        # Creator dashboard hear
 ```
 
 ## Performance Optimizations
